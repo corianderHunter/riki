@@ -1,27 +1,30 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <big-list></big-list>
 </template>
 
-<script lang="ts">
-import HelloWorld from "./components/HelloWorld.vue";
+<script lang = "ts" >
 import { defineComponent } from "vue";
-
+import BigList from "./components/BigList.vue";
 export default defineComponent({
   name: "App",
   components: {
-    HelloWorld,
+    BigList,
   },
 });
 </script>
 
-<style>
+<style lang="scss">
+body,
+html {
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, Roboto, Oxygen, Fira Sans, Helvetica Neue, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  font-size: 16px;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
