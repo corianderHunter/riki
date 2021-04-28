@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import RikiList from "riki";
+import RikiTable from "riki";
 const app = createApp(App)
-app.use(RikiList)
+app.use(RikiTable)
 app.mount('#app')
 

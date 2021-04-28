@@ -1,9 +1,9 @@
 import { App } from "vue";
-import RikiList from './RikiList.vue'
+import RikiTable from './RikiTable.vue'
 
 export default {
   install(app: App, config: any[]) {
-    console.log('RikiList')
-    app.component('RikiList', RikiList)
+    console.log('RikiTable')
+    app.component('RikiTable', RikiTable)
   }
 }

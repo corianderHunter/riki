@@ -1,14 +1,14 @@
 <template>
-  <big-list></big-list>
+  <big-table></big-table>
 </template>
 
 <script lang = "ts" >
 import { defineComponent } from "vue";
-import BigList from "./components/BigList.vue";
+import BigTable from "./components/BigTable.vue";
 export default defineComponent({
   name: "App",
   components: {
-    BigList,
+    BigTable,
   },
 });
 </script>
