@@ -2,19 +2,21 @@
 
 
 <template>
+  <div>构造<input v-model="dataCount" />条数据</div>
   <div class="big-table">
     <riki-table
       :withIndex="true"
       :itemSize="40"
       :itemConfig="configs"
       :dataSource="listData"
+      :noDataRender="renderNoData"
     >
     </riki-table>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="tsx">
+import { h, defineComponent } from "vue";
 
 const configs = [
   { label: "姓名", dataIndex: "name" },
@@ -30,8 +32,8 @@ const testData = {
   remark: "张峰利答复法发大水发达",
 };
 
-const buildData = () =>
-  Array.from({ length: 10000 })
+const buildData = (count: number) =>
+  Array.from({ length: count })
     .fill(null)
     .map((val, index) => {
       return { ...testData, id: index + 1 };
@@ -40,7 +42,18 @@ const buildData = () =>
 export default defineComponent({
   name: "BigTable",
   data() {
-    return { configs, listData: buildData() };
+    return { configs, dataCount: 1220 };
+  },
+  computed: {
+    listData(): any[] {
+      console.log(this.dataCount);
+      return buildData(this.dataCount);
+    },
+  },
+  methods: {
+    renderNoData() {
+      return <div>暂无数据昂....</div>;
+    },
   },
   components: {},
 });
@@ -48,10 +61,9 @@ export default defineComponent({
 
 <style lang="scss">
 .big-table {
-  margin: 100px auto;
+  margin: 0 auto;
   width: 1000px;
   height: 777px;
-  border: 1px solid #ff8e8e;
   .demo-row {
     text-align: center;
     &:nth-child(2n) {
