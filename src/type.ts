@@ -19,12 +19,16 @@ export type RikiTableProps = {
   itemRender?: Function,
   itemConfig?: any[],
   key: string,
-  withIndex?: boolean
+  withIndex?: boolean,
+  border?: boolean,
+  noDataRender?: Function,
+  withSelection?: boolean
 } & XOR<{ dataSource: any[] }, { itemCount: number }>
 
 
 export interface ItemConfig {
   label: string,
   dataIndex: string | string[],
-  width?: string | number
+  width?: string | number,
+  render?: Function
 }

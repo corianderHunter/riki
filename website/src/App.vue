@@ -1,14 +1,17 @@
 <template>
   <big-table></big-table>
+  <test></test>
 </template>
 
 <script lang = "ts" >
 import { defineComponent } from "vue";
 import BigTable from "./components/BigTable.vue";
+import Test from "./components/test.tsx";
 export default defineComponent({
   name: "App",
   components: {
     BigTable,
+    Test,
   },
 });
 </script>

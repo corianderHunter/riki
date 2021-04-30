@@ -2,11 +2,15 @@
 
 
 <template>
-  <div>构造<input v-model="dataCount" />条数据</div>
+  <div style="width: 1000px; margin: 10px auto">
+    <div>构造<input v-model="dataCount" />条数据</div>
+    <div>高度设为<input v-model="itemSize" />px</div>
+  </div>
+  <RikiCheckbox v-model="test"></RikiCheckbox>
   <div class="big-table">
     <riki-table
-      :withIndex="true"
-      :itemSize="40"
+      :withIndex="false"
+      :itemSize="Number(itemSize)"
       :itemConfig="configs"
       :dataSource="listData"
       :noDataRender="renderNoData"
@@ -17,12 +21,20 @@
 
 <script lang="tsx">
 import { h, defineComponent } from "vue";
+import { ItemConfig } from "riki";
+import RikiCheckbox from "../../../src/Checkbox.vue";
 
-const configs = [
+const configs: ItemConfig[] = [
   { label: "姓名", dataIndex: "name" },
   { label: "地址", dataIndex: "address" },
   { label: "号码", dataIndex: "phoneNo", width: 80 },
-  { label: "备注", dataIndex: "remark" },
+  {
+    label: "备注",
+    dataIndex: "remark",
+    render: (item: any) => {
+      return item["remark"] + "rendered by renderFunction";
+    },
+  },
 ];
 
 const testData = {
@@ -42,20 +54,32 @@ const buildData = (count: number) =>
 export default defineComponent({
   name: "BigTable",
   data() {
-    return { configs, dataCount: 1220 };
+    return { configs, dataCount: 1220, itemSize: 40, test: true };
+  },
+  components: {
+    RikiCheckbox,
   },
   computed: {
     listData(): any[] {
-      console.log(this.dataCount);
       return buildData(this.dataCount);
+    },
+  },
+  watch: {
+    test(v) {
+      console.log(this.test);
     },
   },
   methods: {
     renderNoData() {
       return <div>暂无数据昂....</div>;
     },
+    onInput(v: any) {
+      console.log(v);
+    },
+    onChange(v: any) {
+      console.log(v);
+    },
   },
-  components: {},
 });
 </script>
 
