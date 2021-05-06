@@ -18,12 +18,10 @@ export type RikiTableProps = {
   direction?: Direction,
   itemRender?: Function,
   itemConfig?: any[],
-  key: string,
   withIndex?: boolean,
   border?: boolean,
   noDataRender?: Function,
-  withSelection?: boolean
-} & XOR<{ dataSource: any[] }, { itemCount: number }>
+} & XOR<{ dataSource: any[], key: string, }, { itemCount: number }>
 
 
 export interface ItemConfig {

@@ -10,10 +10,10 @@ import {
   computed,
   watch,
   reactive,
+  getCurrentInstance,
 } from "vue";
 import { getScrollbarWidth } from "./helper";
 import { Direction, RikiTableProps } from "./type";
-import RikiCheckbox from "./Checkbox.vue";
 
 const boundaryCount = 2;
 
@@ -54,7 +54,6 @@ export default defineComponent({
     },
     dataSource: {
       type: Array,
-      default: [],
       required: false,
     },
     key: {
@@ -76,32 +75,27 @@ export default defineComponent({
       type: Function,
       required: false,
     },
-    withSelection: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
-  components: { RikiCheckbox },
+  methods: {
+    scrollToIndex(index: number): any {},
+  },
   setup(props, { slots }) {
+    const internalInstance = getCurrentInstance();
     const renderStartIndex = ref(0);
     const renderCount = ref(0);
     const tableRef = ref<HTMLElement>();
+    const tableBodyRef = ref<HTMLElement>();
     const tableHeader = ref<HTMLElement>();
     const tableHeaderCells = ref<HTMLElement[]>([]);
-    const selectAll = ref(true);
-    const state = reactive({
-      selectAll: true,
-    });
 
     onMounted(() => {
-      const tableNode = tableRef.value;
+      const tableBodyNode = tableBodyRef.value;
       const tableHeaderNode = tableHeader.value;
-      if (tableNode) {
+      if (tableBodyNode) {
         const tableSize =
           props.direction === Direction.VERTICAL
-            ? tableNode.offsetHeight
-            : tableNode.offsetWidth;
+            ? tableBodyNode.offsetHeight
+            : tableBodyNode.offsetWidth;
         renderCount.value =
           Math.ceil(tableSize / props.itemSize) + boundaryCount * 2; //额外渲染4个
       }
@@ -113,15 +107,26 @@ export default defineComponent({
           tableHeaderNode.style.paddingBottom = barWidth + "px";
         }
       }
+      //注册method
+      if (internalInstance) {
+        if (internalInstance.ctx) {
+          const tableNode = tableBodyRef.value;
+          internalInstance.ctx.scrollToIndex = (index: number): any => {
+            if (tableNode) {
+              tableNode?.scrollTo(0, Math.max(index - 1, 0) * props.itemSize);
+            }
+          };
+        }
+      }
     });
 
     watch([() => props.dataSource, () => props.itemSize], () => {
-      const tableNode = tableRef.value;
-      if (tableNode) {
+      const tableBodyNode = tableBodyRef.value;
+      if (tableBodyNode) {
         renderStartIndex.value = 0;
         props.direction === Direction.VERTICAL
-          ? (tableNode.scrollTop = 0)
-          : (tableNode.scrollLeft = 0);
+          ? (tableBodyNode.scrollTop = 0)
+          : (tableBodyNode.scrollLeft = 0);
       }
     });
 
@@ -129,11 +134,6 @@ export default defineComponent({
       if (props.itemConfig && props.itemConfig.length) {
         return (
           <div class="riki-table-header" ref={tableHeader}>
-            {props.withSelection ? (
-              <RikiCheckbox
-                v-models={[state.selectAll, "modelValue"]}
-              ></RikiCheckbox>
-            ) : null}
             {props.withIndex ? <div class="table-index"></div> : null}
             {props.itemConfig.map(
               ({ label, dataIndex, width }: any, idx: number) => {
@@ -158,7 +158,13 @@ export default defineComponent({
       return null;
     };
 
-    const defaultItemRender = (item: { [p: string]: any }, index: number) => {
+    const defaultItemRender = ({
+      value: item,
+      index,
+    }: {
+      value: { [p: string]: any };
+      index: number;
+    }) => {
       const itemContent =
         props.itemConfig && props.itemConfig.length
           ? props.itemConfig.map(
@@ -187,11 +193,11 @@ export default defineComponent({
     };
 
     const onScroll = throttle(function (e: UIEvent) {
-      const tableNode = e.target as HTMLElement;
+      const tableBodyNode = e.target as HTMLElement;
       const scrollDistance =
         props.direction === Direction.VERTICAL
-          ? tableNode.scrollTop
-          : tableNode.scrollLeft;
+          ? tableBodyNode.scrollTop
+          : tableBodyNode.scrollLeft;
       requestAnimationFrame(() => {
         renderStartIndex.value = Math.max(
           Math.ceil(scrollDistance / props.itemSize) - 2,
@@ -200,8 +206,14 @@ export default defineComponent({
       });
     }, 100);
 
+    const isSimpleMode = computed(() => {
+      return props.dataSource === undefined;
+    });
+
     const wrapprSize = computed(() => {
-      return props.itemSize * (props.dataSource.length || props.itemCount || 0);
+      return (
+        props.itemSize * (props.dataSource?.length || props.itemCount || 0)
+      );
     });
 
     const finalItemRender = computed(() => {
@@ -238,10 +250,10 @@ export default defineComponent({
           { width: props.width, height: props.height },
         ]}
         class="riki-table"
+        ref={tableRef}
       >
-        <RikiCheckbox v-model={[selectAll, "modelValue"]}></RikiCheckbox>
         {renderTableHeader()}
-        <div class="riki-table-body" onScroll={onScroll} ref={tableRef}>
+        <div class="riki-table-body" onScroll={onScroll} ref={tableBodyRef}>
           {finalItemRender.value ? (
             renderArray.value && renderArray.value.length ? (
               <div
@@ -275,11 +287,11 @@ export default defineComponent({
                           : "width"]: props.itemSize + "px",
                       }}
                     >
-                      {finalItemRender.value(
-                        v,
-                        renderStartIndex.value + index,
-                        renderStartIndex.value
-                      )}
+                      {finalItemRender.value({
+                        value: v,
+                        index: renderStartIndex.value + index,
+                        offsetIndex: renderStartIndex.value,
+                      })}
                     </div>
                   );
                 })}
@@ -290,7 +302,7 @@ export default defineComponent({
               </div>
             )
           ) : (
-            <div class="riki-table-empty">"请设置渲染函数"</div>
+            <div class="riki-table-empty">请设置渲染函数</div>
           )}
         </div>
       </div>
@@ -316,6 +328,8 @@ export default defineComponent({
   .riki-table-header {
     display: flex;
     background-color: #fafafa;
+    align-items: center;
+    justify-content: center;
     .riki-table-header-cell {
       flex: 1;
       padding: 16px;

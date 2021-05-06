@@ -4,11 +4,13 @@
 <template>
   <div style="width: 1000px; margin: 10px auto">
     <div>构造<input v-model="dataCount" />条数据</div>
-    <div>高度设为<input v-model="itemSize" />px</div>
+    <div>高度设为<input v-model="itemCount" />px</div>
+    <div>简单模式 总条数 <input v-model="dataCount" /></div>
+    <div>滚到 <input v-model="showIndex" /> 条</div>
   </div>
-  <RikiCheckbox v-model="test"></RikiCheckbox>
   <div class="big-table">
     <riki-table
+      ref="rikiTable"
       :withIndex="true"
       :withSelection="true"
       :itemSize="Number(itemSize)"
@@ -18,12 +20,26 @@
     >
     </riki-table>
   </div>
+  <div style="width: 1000px; margin: 10px auto">
+    <div>简单模式 总条数<input v-model="itemCount" /></div>
+  </div>
+  <div class="big-table">
+    <riki-table
+      :withIndex="true"
+      :itemSize="Number(itemSize)"
+      :itemCount="Number(itemCount)"
+      :noDataRender="renderNoData"
+    >
+      <template v-slot:default="slotProps"
+        ><div>{{ slotProps.value }}</div>
+      </template>
+    </riki-table>
+  </div>
 </template>
 
 <script lang="tsx">
 import { h, defineComponent } from "vue";
 import { ItemConfig } from "riki";
-import RikiCheckbox from "../../../src/Checkbox.vue";
 
 const configs: ItemConfig[] = [
   { label: "姓名", dataIndex: "name" },
@@ -55,30 +71,29 @@ const buildData = (count: number) =>
 export default defineComponent({
   name: "BigTable",
   data() {
-    return { configs, dataCount: 1220, itemSize: 40, test: true };
-  },
-  components: {
-    RikiCheckbox,
+    return {
+      configs,
+      dataCount: 1220,
+      itemSize: 40,
+      itemCount: 1000,
+      showIndex: 0,
+    };
   },
   computed: {
     listData(): any[] {
       return buildData(this.dataCount);
     },
   },
+  mounted() {},
   watch: {
-    test(v) {
-      console.log(this.test);
+    showIndex(v) {
+      const rikiTable = this.$refs.rikiTable;
+      rikiTable?.scrollToIndex(v);
     },
   },
   methods: {
     renderNoData() {
       return <div>暂无数据昂....</div>;
-    },
-    onInput(v: any) {
-      console.log(v);
-    },
-    onChange(v: any) {
-      console.log(v);
     },
   },
 });
