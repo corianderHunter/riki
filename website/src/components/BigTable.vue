@@ -9,7 +9,8 @@
   <RikiCheckbox v-model="test"></RikiCheckbox>
   <div class="big-table">
     <riki-table
-      :withIndex="false"
+      :withIndex="true"
+      :withSelection="true"
       :itemSize="Number(itemSize)"
       :itemConfig="configs"
       :dataSource="listData"
