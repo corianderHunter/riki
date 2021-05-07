@@ -9,7 +9,6 @@ import {
   onMounted,
   computed,
   watch,
-  reactive,
   getCurrentInstance,
 } from "vue";
 import { getScrollbarWidth } from "./helper";
@@ -205,10 +204,6 @@ export default defineComponent({
         );
       });
     }, 100);
-
-    const isSimpleMode = computed(() => {
-      return props.dataSource === undefined;
-    });
 
     const wrapprSize = computed(() => {
       return (
