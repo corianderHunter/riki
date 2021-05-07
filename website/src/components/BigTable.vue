@@ -56,9 +56,9 @@ const configs: ItemConfig[] = [
 
 const testData = {
   name: "11",
-  address: "雨花台起大风大",
+  address: "nanjing",
   phoneNo: "13243421111",
-  remark: "张峰利答复法发大水发达",
+  remark: "test remark",
 };
 
 const buildData = (count: number) =>
